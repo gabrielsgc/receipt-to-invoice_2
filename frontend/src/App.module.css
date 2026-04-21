@@ -216,6 +216,30 @@
   border-top: 1px solid var(--border-subtle);
 }
 
+/* ── Mode Toggle ─────────────────────────────── */
+.modeToggle {
+  margin-left: auto;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.modeToggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.modeToggleActive {
+  background: rgba(212,160,83,0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* ── Responsive ──────────────────────────────── */
 @media (max-width: 640px) {
   .headerInner {

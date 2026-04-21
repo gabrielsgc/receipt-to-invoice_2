@@ -13,11 +13,13 @@ class ReceiptData(BaseModel):
     vendor_name: Optional[str] = None
     vendor_address: Optional[str] = None
     vendor_phone: Optional[str] = None
+    vendor_tax_id: Optional[str] = None
     date: Optional[str] = None
     receipt_number: Optional[str] = None
+    simplified_invoice_number: Optional[str] = None
     items: list[ReceiptItem] = []
     subtotal: Optional[float] = None
     tax: Optional[float] = None
     total: Optional[float] = None
-    currency: Optional[str] = "USD"
+    currency: Optional[str] = "EUR"
     notes: Optional[str] = None

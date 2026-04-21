@@ -42,14 +42,16 @@ def _get_anthropic_client() -> Anthropic | None:
         _anthropic_client = Anthropic(api_key=api_key, http_client=_get_ssl_http_client())
     return _anthropic_client
 
-EXTRACTION_PROMPT = """Analyze this receipt image and extract all relevant information.
+EXTRACTION_PROMPT = """Analyze this receipt/ticket image from a Spanish store and extract all relevant information.
 Return a JSON object with the following structure (use null for missing fields):
 {
-  "vendor_name": "string",
-  "vendor_address": "string",
+  "vendor_name": "string (razón social del comercio)",
+  "vendor_address": "string (dirección completa)",
   "vendor_phone": "string",
+  "vendor_tax_id": "string (CIF/NIF del comercio, e.g. A46103834)",
   "date": "YYYY-MM-DD",
-  "receipt_number": "string",
+  "receipt_number": "string (número de ticket)",
+  "simplified_invoice_number": "string (número de factura simplificada, e.g. 1234-001-123456)",
   "items": [
     {
       "description": "string",
@@ -59,11 +61,13 @@ Return a JSON object with the following structure (use null for missing fields):
     }
   ],
   "subtotal": number,
-  "tax": number,
+  "tax": number (IVA amount),
   "total": number,
-  "currency": "USD",
-  "notes": "string"
+  "currency": "EUR",
+  "notes": "string (store number, cashier, any other info)"
 }
+Important: currency is almost always EUR for Spanish stores. Look for CIF/NIF on the ticket header.
+Look for "Factura simplificada" or "Fact. Simplificada" number which is different from the ticket number.
 Return ONLY the JSON object, no extra text."""
 
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import UploadReceipt from './components/UploadReceipt'
 import InvoiceForm from './components/InvoiceForm'
+import BatchMode from './components/BatchMode'
 import styles from './App.module.css'
 
 const STEPS = [
@@ -13,6 +14,7 @@ const STEPS = [
 export default function App() {
   const [step, setStep] = useState(0)
   const [receiptData, setReceiptData] = useState(null)
+  const [batchMode, setBatchMode] = useState(false)
 
   function handleReceiptExtracted(data) {
     setReceiptData(data)
@@ -57,7 +59,7 @@ export default function App() {
           </div>
 
           <nav className={styles.steps}>
-            {STEPS.map(({ label, icon }, i) => (
+            {!batchMode && STEPS.map(({ label, icon }, i) => (
               <div key={label} className={styles.stepWrapper}>
                 {i > 0 && <div className={`${styles.stepLine} ${i <= step ? styles.stepLineFilled : ''}`} />}
                 <button
@@ -69,11 +71,23 @@ export default function App() {
                 </button>
               </div>
             ))}
+            <button
+              className={`${styles.modeToggle} ${batchMode ? styles.modeToggleActive : ''}`}
+              onClick={() => { setBatchMode(!batchMode); handleReset() }}
+            >
+              {batchMode ? '📄 Individual' : '📦 Lotes'}
+            </button>
           </nav>
         </div>
       </header>
 
       <main className={styles.main}>
+        {batchMode ? (
+          <div className={styles.fadeIn}>
+            <BatchMode onBack={() => { setBatchMode(false); handleReset() }} />
+          </div>
+        ) : (
+          <>
         {step === 0 && (
           <div className={styles.fadeIn}>
             <UploadReceipt onExtracted={handleReceiptExtracted} />
@@ -97,16 +111,18 @@ export default function App() {
                 <polyline points="22 4 12 14.01 9 11.01"/>
               </svg>
             </div>
-            <h2 className={styles.doneTitle}>Invoice exported</h2>
-            <p className={styles.doneDesc}>Your PDF has been generated and downloaded successfully.</p>
+            <h2 className={styles.doneTitle}>Factura exportada</h2>
+            <p className={styles.doneDesc}>Tu PDF se ha generado y descargado correctamente.</p>
             <button className={styles.primaryBtn} onClick={handleReset}>
-              <span>Convert another receipt</span>
+              <span>Convertir otro ticket</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="23 4 23 10 17 10"/>
                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
               </svg>
             </button>
           </div>
+        )}
+          </>
         )}
       </main>
 

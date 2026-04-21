@@ -11,24 +11,25 @@ function buildDefaultValues(receiptData) {
 
   return {
     invoice_number: invoiceNum,
+    simplified_invoice_number: receiptData?.simplified_invoice_number || '',
     date: today,
     due_date: due,
-    currency: receiptData?.currency || 'USD',
+    currency: receiptData?.currency || 'EUR',
     notes: receiptData?.notes || '',
     payment_terms: 'Net 30',
     issuer: {
-      name: '',
-      address: '',
-      phone: '',
-      email: '',
-      tax_id: '',
-    },
-    client: {
       name: receiptData?.vendor_name || '',
       address: receiptData?.vendor_address || '',
       phone: receiptData?.vendor_phone || '',
       email: '',
-      tax_id: '',
+      tax_id: receiptData?.vendor_tax_id || '',
+    },
+    client: {
+      name: 'Gabriel Eduardo Santisteban Garcia',
+      address: '',
+      phone: '',
+      email: '',
+      tax_id: '78890774S',
     },
     items: receiptData?.items?.length
       ? receiptData.items
@@ -81,6 +82,11 @@ function PartySection({ title, icon, prefix, register, errors }) {
 
 export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
   const [loading, setLoading] = useState(false)
+  const [mercadonaLoading, setMercadonaLoading] = useState(false)
+  const [mercadonaScreenshots, setMercadonaScreenshots] = useState([])
+
+  // Detect if vendor is Mercadona
+  const isMercadona = receiptData?.vendor_name?.toLowerCase().includes('mercadona')
 
   const {
     register,
@@ -119,6 +125,56 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
   function handleTaxRateChange(e) {
     const rate = parseFloat(e.target.value) || 0
     recalcTotals(items, rate)
+  }
+
+  async function requestMercadonaInvoice() {
+    setMercadonaLoading(true)
+    setMercadonaScreenshots([])
+    const toastId = toast.loading('Buscando ticket en portal Mercadona…')
+    try {
+      // Format date from YYYY-MM-DD to DD/MM/YYYY
+      let dateStr = receiptData?.date || null
+      if (dateStr && dateStr.includes('-')) {
+        const [y, m, d] = dateStr.split('-')
+        dateStr = `${d}/${m}/${y}`
+      }
+      // Format amount: replace dot with comma for Spanish format
+      let amount = receiptData?.total?.toString() || null
+      if (amount) amount = amount.replace('.', ',')
+
+      const payload = {
+        payment_method: 'card',
+        purchase_date: dateStr,
+        total_amount: amount,
+        card_last4: null,
+        store_address: receiptData?.vendor_address || receiptData?.notes || null,
+      }
+      const res = await axios.post('/api/mercadona/request-ticket', payload)
+      const { success, message, pdf_base64, screenshots_base64 } = res.data
+
+      if (screenshots_base64?.length) {
+        setMercadonaScreenshots(screenshots_base64)
+      }
+
+      if (success && pdf_base64) {
+        const bytes = Uint8Array.from(atob(pdf_base64), c => c.charCodeAt(0))
+        const blob = new Blob([bytes], { type: 'application/pdf' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `mercadona-ticket-${receiptData?.receipt_number || 'oficial'}.pdf`
+        a.click()
+        URL.revokeObjectURL(url)
+        toast.success('Ticket de Mercadona descargado', { id: toastId })
+      } else {
+        toast.error(message || 'No se encontró el ticket', { id: toastId, duration: 8000 })
+      }
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.message
+      toast.error(`Error portal Mercadona: ${msg}`, { id: toastId, duration: 8000 })
+    } finally {
+      setMercadonaLoading(false)
+    }
   }
 
   async function onSubmit(data) {
@@ -168,7 +224,26 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
             <p className={styles.titleHint}>Review and complete the extracted data</p>
           </div>
         </div>
-        <button type="submit" className={styles.submitBtn} disabled={loading}>
+        <div className={styles.headerActions}>
+          {isMercadona && (
+            <button
+              type="button"
+              className={styles.mercadonaBtn}
+              disabled={mercadonaLoading}
+              onClick={requestMercadonaInvoice}
+              title="Solicitar factura oficial desde el portal de Mercadona"
+            >
+              {mercadonaLoading ? (
+                <span className={styles.submitLoading}>
+                  <span className={styles.submitSpinner} />
+                  Portal…
+                </span>
+              ) : (
+                <>🏪 Factura oficial</>
+              )}
+            </button>
+          )}
+          <button type="submit" className={styles.submitBtn} disabled={loading}>
           {loading ? (
             <span className={styles.submitLoading}>
               <span className={styles.submitSpinner} />
@@ -185,6 +260,7 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
             </>
           )}
         </button>
+        </div>
       </div>
 
       {/* Invoice meta */}
@@ -203,6 +279,9 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
         <div className={styles.grid3}>
           <Field label="Invoice No. *" error={errors.invoice_number}>
             <input {...register('invoice_number', { required: 'Required' })} className={`${styles.input} ${styles.monoInput}`} />
+          </Field>
+          <Field label="Nº Factura Simplificada">
+            <input {...register('simplified_invoice_number')} className={`${styles.input} ${styles.monoInput}`} placeholder="FS-2024-001234" />
           </Field>
           <Field label="Date *" error={errors.date}>
             <input {...register('date', { required: 'Required' })} type="date" className={styles.input} />
@@ -349,10 +428,37 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
       {/* Mobile submit */}
       <div className={styles.mobileActions}>
         <button type="button" className={styles.ghostBtn} onClick={onReset}>Cancel</button>
+        {isMercadona && (
+          <button type="button" className={styles.mercadonaBtn} disabled={mercadonaLoading} onClick={requestMercadonaInvoice}>
+            {mercadonaLoading ? 'Portal…' : '🏪 Oficial'}
+          </button>
+        )}
         <button type="submit" className={styles.submitBtn} disabled={loading}>
           {loading ? 'Generating…' : 'Export PDF'}
         </button>
       </div>
+
+      {/* Mercadona portal debug screenshots */}
+      {mercadonaScreenshots.length > 0 && (
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>
+            <span className={styles.sectionIcon}>🏪</span>
+            Capturas del portal Mercadona ({mercadonaScreenshots.length} pasos)
+          </h3>
+          <div className={styles.screenshotGrid}>
+            {mercadonaScreenshots.map((b64, i) => (
+              <div key={i} className={styles.screenshotWrap}>
+                <p className={styles.screenshotLabel}>Paso {i + 1}</p>
+                <img
+                  src={`data:image/png;base64,${b64}`}
+                  alt={`Portal paso ${i + 1}`}
+                  className={styles.screenshotImg}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </form>
   )
 }

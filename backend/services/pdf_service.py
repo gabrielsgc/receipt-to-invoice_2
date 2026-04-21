@@ -74,17 +74,18 @@ def generate_invoice_pdf(invoice: InvoiceData) -> bytes:
     # ── Header: INVOICE title + invoice number / date ──────────────────────
     header_data = [
         [
-            Paragraph("INVOICE", title_style),
+            Paragraph("FACTURA", title_style),
             Table(
                 [
-                    [Paragraph("Invoice No.", label_style), Paragraph(invoice.invoice_number, value_style)],
-                    [Paragraph("Date", label_style), Paragraph(invoice.date, value_style)],
+                    [Paragraph("N\u00ba Factura", label_style), Paragraph(invoice.invoice_number, value_style)],
+                    [Paragraph("N\u00ba Fact. Simplificada", label_style), Paragraph(invoice.simplified_invoice_number or "\u2014", value_style)],
+                    [Paragraph("Fecha", label_style), Paragraph(invoice.date, value_style)],
                     [
-                        Paragraph("Due Date", label_style),
-                        Paragraph(invoice.due_date or "—", value_style),
+                        Paragraph("Fecha vencimiento", label_style),
+                        Paragraph(invoice.due_date or "\u2014", value_style),
                     ],
                 ],
-                colWidths=[25 * mm, 45 * mm],
+                colWidths=[30 * mm, 45 * mm],
                 style=TableStyle([("ALIGN", (0, 0), (-1, -1), "LEFT")]),
             ),
         ]
@@ -106,26 +107,27 @@ def generate_invoice_pdf(invoice: InvoiceData) -> bytes:
         if party.email:
             block.append(Paragraph(party.email, value_style))
         if party.tax_id:
-            block.append(Paragraph(f"Tax ID: {party.tax_id}", value_style))
+            block.append(Paragraph(f"DNI/NIF: {party.tax_id}", value_style))
         return block
 
-    parties_data = [[party_block(invoice.issuer, "FROM"), party_block(invoice.client, "BILL TO")]]
+    parties_data = [[party_block(invoice.issuer, "EMISOR"), party_block(invoice.client, "DESTINATARIO")]]
     parties_table = Table(parties_data, colWidths=[90 * mm, 90 * mm])
     parties_table.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")]))
     elements.append(parties_table)
     elements.append(Spacer(1, 8 * mm))
 
     # ── Items table ─────────────────────────────────────────────────────────
-    currency = invoice.currency or "USD"
-    col_headers = ["Description", "Qty", "Unit Price", "Total"]
+    currency = invoice.currency or "EUR"
+    sym = "\u20ac" if currency == "EUR" else currency
+    col_headers = ["Descripci\u00f3n", "Cant.", "Precio Ud.", "Total"]
     item_rows = [col_headers]
     for item in invoice.items:
         item_rows.append(
             [
                 item.description,
                 str(item.quantity),
-                f"{currency} {item.unit_price:,.2f}",
-                f"{currency} {item.total:,.2f}",
+                f"{item.unit_price:,.2f} {sym}",
+                f"{item.total:,.2f} {sym}",
             ]
         )
 
@@ -154,15 +156,15 @@ def generate_invoice_pdf(invoice: InvoiceData) -> bytes:
 
     # ── Totals ──────────────────────────────────────────────────────────────
     totals_data = [
-        ["", Paragraph("Subtotal", right_style), Paragraph(f"{currency} {invoice.subtotal:,.2f}", right_style)],
+        ["", Paragraph("Base imponible", right_style), Paragraph(f"{invoice.subtotal:,.2f} {sym}", right_style)],
     ]
     if invoice.tax_amount:
-        tax_label = f"Tax ({invoice.tax_rate:.0f}%)" if invoice.tax_rate else "Tax"
+        tax_label = f"IVA ({invoice.tax_rate:.0f}%)" if invoice.tax_rate else "IVA"
         totals_data.append(
-            ["", Paragraph(tax_label, right_style), Paragraph(f"{currency} {invoice.tax_amount:,.2f}", right_style)]
+            ["", Paragraph(tax_label, right_style), Paragraph(f"{invoice.tax_amount:,.2f} {sym}", right_style)]
         )
     totals_data.append(
-        ["", Paragraph("TOTAL", bold_right_style), Paragraph(f"{currency} {invoice.total:,.2f}", bold_right_style)]
+        ["", Paragraph("TOTAL", bold_right_style), Paragraph(f"{invoice.total:,.2f} {sym}", bold_right_style)]
     )
 
     totals_table = Table(totals_data, colWidths=[100 * mm, 50 * mm, 30 * mm])
@@ -183,20 +185,35 @@ def generate_invoice_pdf(invoice: InvoiceData) -> bytes:
         elements.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#E5E7EB")))
         elements.append(Spacer(1, 4 * mm))
         if invoice.payment_terms:
-            elements.append(Paragraph("Payment Terms", label_style))
+            elements.append(Paragraph("Condiciones de pago", label_style))
             elements.append(Paragraph(invoice.payment_terms, value_style))
             elements.append(Spacer(1, 3 * mm))
         if invoice.notes:
-            elements.append(Paragraph("Notes", label_style))
+            elements.append(Paragraph("Observaciones", label_style))
             elements.append(Paragraph(invoice.notes, value_style))
 
+    # ── Legal disclaimer ────────────────────────────────────────────────────
+    elements.append(Spacer(1, 8 * mm))
+    elements.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#E5E7EB")))
+    elements.append(Spacer(1, 3 * mm))
+    disclaimer_style = ParagraphStyle(
+        "Disclaimer", parent=styles["Normal"], fontSize=7, textColor=colors.HexColor("#6B7280"),
+        leading=9,
+    )
+    elements.append(Paragraph(
+        "Documento generado a partir de ticket/factura simplificada conforme al "
+        "Real Decreto 1619/2012, art. 7. Datos fiscales del emisor y destinatario "
+        "incluidos a efectos de deducción en IRPF. Conservar junto con el ticket original.",
+        disclaimer_style,
+    ))
+
     # ── Footer ──────────────────────────────────────────────────────────────
-    elements.append(Spacer(1, 10 * mm))
+    elements.append(Spacer(1, 6 * mm))
     footer_style = ParagraphStyle(
         "Footer", parent=styles["Normal"], fontSize=7, textColor=colors.HexColor("#9CA3AF"), alignment=TA_CENTER
     )
     elements.append(
-        Paragraph(f"Generated on {datetime.now().strftime('%Y-%m-%d %H:%M')} · Receipt to Invoice", footer_style)
+        Paragraph(f"Generado el {datetime.now().strftime('%d/%m/%Y %H:%M')} · Receipt to Invoice", footer_style)
     )
 
     doc.build(elements)

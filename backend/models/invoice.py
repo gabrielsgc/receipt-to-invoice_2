@@ -13,6 +13,7 @@ class InvoiceParty(BaseModel):
 
 class InvoiceData(BaseModel):
     invoice_number: str
+    simplified_invoice_number: Optional[str] = None
     date: str
     due_date: Optional[str] = None
     issuer: InvoiceParty
@@ -22,6 +23,6 @@ class InvoiceData(BaseModel):
     tax_rate: Optional[float] = 0.0
     tax_amount: Optional[float] = 0.0
     total: float
-    currency: Optional[str] = "USD"
+    currency: Optional[str] = "EUR"
     notes: Optional[str] = None
     payment_terms: Optional[str] = None
