@@ -1,10 +1,11 @@
 import base64
 import json
 import os
+from pathlib import Path
 from openai import OpenAI
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 _client = None
 
