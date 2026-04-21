@@ -1,0 +1,236 @@
+/* ═══════════════════════════════════════════════
+   App Shell — Dark Onyx Fintech
+   ═══════════════════════════════════════════════ */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ──────────────────────────────────── */
+.header {
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.headerInner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logoGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoMark {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), #B8842E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0A0A0F;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(212, 160, 83, 0.25);
+}
+
+.logoText {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.logoAccent {
+  color: var(--accent);
+  margin: 0 1px;
+  font-weight: 700;
+}
+
+/* ── Steps nav ───────────────────────────────── */
+.steps {
+  display: flex;
+  align-items: center;
+}
+
+.stepWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.stepLine {
+  width: 32px;
+  height: 1px;
+  background: var(--border-default);
+  transition: background var(--transition-smooth);
+}
+
+.stepLineFilled {
+  background: var(--accent);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all var(--transition-smooth);
+  white-space: nowrap;
+}
+
+.stepActive {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-color: rgba(212, 160, 83, 0.2);
+}
+
+.stepDone {
+  color: var(--success);
+  background: var(--success-dim);
+}
+
+.stepIcon {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.stepLabel {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Main ────────────────────────────────────── */
+.main {
+  flex: 1;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 28px 60px;
+}
+
+.fadeIn {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+/* ── Done Card ───────────────────────────────── */
+.doneCard {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 64px 48px;
+  text-align: center;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+.doneGlow {
+  position: absolute;
+  top: -60%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(61, 214, 140, 0.12), transparent 70%);
+  pointer-events: none;
+}
+
+.doneIconWrap {
+  margin-bottom: 20px;
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.doneTitle {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  animation: fadeInUp 0.5s ease-out 0.3s both;
+}
+
+.doneDesc {
+  color: var(--text-secondary);
+  font-size: 15px;
+  margin-bottom: 32px;
+  line-height: 1.5;
+  animation: fadeInUp 0.5s ease-out 0.4s both;
+}
+
+/* ── Primary Button ──────────────────────────── */
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--accent), #C08A3A);
+  color: #0A0A0F;
+  border: none;
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 12px rgba(212, 160, 83, 0.2);
+  animation: fadeInUp 0.5s ease-out 0.5s both;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(212, 160, 83, 0.35);
+}
+
+.primaryBtn:active {
+  transform: translateY(0);
+}
+
+/* ── Footer ──────────────────────────────────── */
+.footer {
+  padding: 20px 28px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 640px) {
+  .headerInner {
+    flex-direction: column;
+    height: auto;
+    gap: 8px;
+    padding: 12px 0;
+  }
+  .stepLabel {
+    display: none;
+  }
+  .main {
+    padding: 24px 16px 48px;
+  }
+  .doneCard {
+    padding: 40px 24px;
+  }
+}

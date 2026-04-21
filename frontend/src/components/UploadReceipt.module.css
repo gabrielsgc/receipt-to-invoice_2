@@ -1,0 +1,314 @@
+/* ═══════════════════════════════════════════════
+   Upload Receipt — Dark Onyx Fintech
+   ═══════════════════════════════════════════════ */
+
+.wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── Hero ────────────────────────────────────── */
+.hero {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(212, 160, 83, 0.15);
+  padding: 4px 14px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+  font-family: var(--font-mono);
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.title {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+  animation: fadeInUp 0.5s ease-out 0.1s both;
+}
+
+.titleAccent {
+  background: linear-gradient(135deg, var(--accent), #F0C97A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto;
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+/* ── Dropzone ────────────────────────────────── */
+.dropzone {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: 4px;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  animation: fadeInUp 0.5s ease-out 0.3s both;
+  overflow: hidden;
+}
+
+.dropzone:hover {
+  border-color: rgba(212, 160, 83, 0.3);
+  box-shadow: 0 0 0 1px rgba(212, 160, 83, 0.1), 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.dropzone:hover .uploadIcon {
+  transform: translateY(-2px);
+  color: var(--accent);
+}
+
+.active {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent), 0 0 40px rgba(212, 160, 83, 0.15) !important;
+}
+
+.active .uploadIcon {
+  color: var(--accent);
+  animation: pulse-glow 1.5s ease infinite;
+}
+
+.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.dropzoneInner {
+  background: var(--bg-secondary);
+  border-radius: calc(var(--radius-xl) - 4px);
+  padding: 56px 32px;
+  text-align: center;
+  border: 1px dashed var(--border-subtle);
+}
+
+/* Corner decorations */
+.corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--accent);
+  border-style: solid;
+  opacity: 0;
+  transition: opacity var(--transition-smooth);
+}
+
+.dropzone:hover .corner,
+.active .corner {
+  opacity: 0.5;
+}
+
+.cornerTL { top: 12px; left: 12px; border-width: 2px 0 0 2px; border-radius: 3px 0 0 0; }
+.cornerTR { top: 12px; right: 12px; border-width: 2px 2px 0 0; border-radius: 0 3px 0 0; }
+.cornerBL { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; border-radius: 0 0 0 3px; }
+.cornerBR { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; border-radius: 0 0 3px 0; }
+
+.uploadIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: var(--text-secondary);
+  transition: all var(--transition-smooth);
+}
+
+.dropText {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.fileTypes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.fileTag {
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 6px;
+  color: var(--tag-color);
+  background: color-mix(in srgb, var(--tag-color) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tag-color) 15%, transparent);
+}
+
+.sizeHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* ── Loading state ───────────────────────────── */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.spinnerTrack {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--accent);
+  border-right-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingText {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.loadingHint {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Preview ─────────────────────────────────── */
+.previewWrapper {
+  margin-top: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.previewLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.previewDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+}
+
+.preview {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  margin: 0 auto;
+  padding: 12px;
+  object-fit: contain;
+}
+
+/* ── Divider ─────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 28px 0;
+  animation: fadeInUp 0.5s ease-out 0.4s both;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.dividerText {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Manual button ───────────────────────────── */
+.manualBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 24px;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  animation: fadeInUp 0.5s ease-out 0.5s both;
+}
+
+.manualBtn:hover {
+  background: var(--bg-elevated);
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 28px;
+  }
+  .dropzoneInner {
+    padding: 40px 20px;
+  }
+}

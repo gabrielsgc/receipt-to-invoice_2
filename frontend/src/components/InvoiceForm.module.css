@@ -1,0 +1,475 @@
+/* ═══════════════════════════════════════════════
+   Invoice Form — Dark Onyx Fintech
+   ═══════════════════════════════════════════════ */
+
+.form {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease-out both;
+  box-shadow: var(--shadow-card);
+}
+
+/* ── Header ──────────────────────────────────── */
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 28px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.formHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.backBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.backBtn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.titleHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.submitBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--accent), #C08A3A);
+  color: #0A0A0F;
+  border: none;
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 12px rgba(212, 160, 83, 0.2);
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(212, 160, 83, 0.35);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.submitLoading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.submitSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(10,10,15,0.2);
+  border-top-color: #0A0A0F;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Section ─────────────────────────────────── */
+.section {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border-subtle);
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 18px;
+  font-family: var(--font-mono);
+}
+
+.sectionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── Parties side-by-side ────────────────────── */
+.partiesRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.partiesRow > .section {
+  border-bottom: none;
+}
+
+.partiesRow > .section:first-child {
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* ── Grids ────────────────────────────────────── */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px 14px;
+}
+
+/* ── Field ────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+}
+
+.input {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+  background: var(--bg-elevated);
+}
+
+.monoInput {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.error {
+  font-size: 11px;
+  color: var(--danger);
+  font-family: var(--font-mono);
+}
+
+/* ── Items Table ─────────────────────────────── */
+.itemsTable {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.itemsHeader {
+  display: grid;
+  grid-template-columns: 1fr 72px 100px 100px 36px;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+}
+
+.itemRow {
+  display: grid;
+  grid-template-columns: 1fr 72px 100px 100px 36px;
+  gap: 8px;
+  padding: 8px 14px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--transition-fast);
+}
+
+.itemRow:last-of-type {
+  border-bottom: none;
+}
+
+.itemRow:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.totalInput {
+  background: var(--bg-elevated) !important;
+  color: var(--accent) !important;
+  font-weight: 600;
+  border-color: transparent !important;
+}
+
+.removeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.removeBtn:hover {
+  color: var(--danger);
+  background: var(--danger-dim);
+  border-color: rgba(240, 96, 96, 0.15);
+}
+
+.addItemBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  border-top: 1px dashed var(--border-default);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.addItemBtn:hover {
+  background: rgba(255,255,255,0.03);
+  color: var(--accent);
+}
+
+/* ── Bottom / Totals ─────────────────────────── */
+.bottomSection {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 28px;
+}
+
+.notesCol {}
+
+.textarea {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  width: 100%;
+  resize: vertical;
+  transition: all var(--transition-fast);
+  min-height: 88px;
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+  background: var(--bg-elevated);
+}
+
+.amountsCol {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-secondary);
+  align-self: start;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.totalRow:last-child {
+  border-bottom: none;
+}
+
+.totalLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.totalValue {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.grandTotal {
+  background: var(--accent-dim);
+  border-top: 1px solid rgba(212, 160, 83, 0.2);
+}
+
+.grandTotal .totalLabel {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.grandTotal .totalValue {
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.taxInput {
+  display: inline-block;
+  width: 48px;
+  margin-left: 6px;
+  padding: 3px 6px;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.taxInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.taxPercent {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── Actions (mobile) ────────────────────────── */
+.mobileActions {
+  display: none;
+  padding: 20px 28px;
+  gap: 12px;
+}
+
+.ghostBtn {
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  flex: 1;
+}
+
+.ghostBtn:hover {
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text-primary);
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 768px) {
+  .formHeader {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .formHeaderLeft {
+    justify-content: space-between;
+  }
+  .submitBtn {
+    display: none;
+  }
+  .mobileActions {
+    display: flex;
+  }
+  .partiesRow {
+    grid-template-columns: 1fr;
+  }
+  .partiesRow > .section:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .grid2, .grid3 {
+    grid-template-columns: 1fr;
+  }
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+  .itemsHeader, .itemRow {
+    grid-template-columns: 1fr 60px 80px 80px 32px;
+  }
+}
