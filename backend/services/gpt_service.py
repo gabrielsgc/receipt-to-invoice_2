@@ -10,7 +10,7 @@ from openai import OpenAI
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=True)
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +97,7 @@ def _extract_with_claude(image_bytes: bytes, mime_type: str) -> str:
     # Claude accepts media_type directly for image content
     media_type = mime_type if mime_type in ("image/jpeg", "image/png", "image/gif", "image/webp") else "image/jpeg"
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1500,
         messages=[
             {
