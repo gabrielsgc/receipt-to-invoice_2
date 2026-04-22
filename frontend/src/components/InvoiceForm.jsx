@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import axios from 'axios'
+import PropTypes from 'prop-types'
 import styles from './InvoiceForm.module.css'
 
 function buildDefaultValues(receiptData) {
@@ -51,6 +52,12 @@ function Field({ label, error, children }) {
   )
 }
 
+Field.propTypes = {
+  label: PropTypes.string.isRequired,
+  error: PropTypes.shape({ message: PropTypes.string }),
+  children: PropTypes.node.isRequired,
+}
+
 function PartySection({ title, icon, prefix, register, errors }) {
   const e = errors?.[prefix] || {}
   return (
@@ -80,6 +87,14 @@ function PartySection({ title, icon, prefix, register, errors }) {
   )
 }
 
+PartySection.propTypes = {
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+  prefix: PropTypes.string.isRequired,
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+}
+
 export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
   const [loading, setLoading] = useState(false)
   const [mercadonaLoading, setMercadonaLoading] = useState(false)
@@ -100,30 +115,30 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
   const { fields, append, remove } = useFieldArray({ control, name: 'items' })
 
   const items = watch('items')
-  const taxRate = parseFloat(watch('tax_rate') || 0)
+  const taxRate = Number.parseFloat(watch('tax_rate') || 0)
 
   function recalcTotals(newItems, rate) {
-    const subtotal = newItems.reduce((sum, it) => sum + (parseFloat(it.total) || 0), 0)
+    const subtotal = newItems.reduce((sum, it) => sum + (Number.parseFloat(it.total) || 0), 0)
     const taxAmount = subtotal * (rate / 100)
-    setValue('subtotal', parseFloat(subtotal.toFixed(2)))
-    setValue('tax_amount', parseFloat(taxAmount.toFixed(2)))
-    setValue('total', parseFloat((subtotal + taxAmount).toFixed(2)))
+    setValue('subtotal', Number.parseFloat(subtotal.toFixed(2)))
+    setValue('tax_amount', Number.parseFloat(taxAmount.toFixed(2)))
+    setValue('total', Number.parseFloat((subtotal + taxAmount).toFixed(2)))
   }
 
   function handleItemChange(index, field, value) {
     const updated = [...items]
     updated[index] = { ...updated[index], [field]: value }
     if (field === 'quantity' || field === 'unit_price') {
-      const qty = parseFloat(updated[index].quantity) || 0
-      const price = parseFloat(updated[index].unit_price) || 0
-      updated[index].total = parseFloat((qty * price).toFixed(2))
+      const qty = Number.parseFloat(updated[index].quantity) || 0
+      const price = Number.parseFloat(updated[index].unit_price) || 0
+      updated[index].total = Number.parseFloat((qty * price).toFixed(2))
       setValue(`items.${index}.total`, updated[index].total)
     }
     recalcTotals(updated, taxRate)
   }
 
   function handleTaxRateChange(e) {
-    const rate = parseFloat(e.target.value) || 0
+    const rate = Number.parseFloat(e.target.value) || 0
     recalcTotals(items, rate)
   }
 
@@ -134,7 +149,7 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
     try {
       // Format date from YYYY-MM-DD to DD/MM/YYYY
       let dateStr = receiptData?.date || null
-      if (dateStr && dateStr.includes('-')) {
+      if (dateStr?.includes('-')) {
         const [y, m, d] = dateStr.split('-')
         dateStr = `${d}/${m}/${y}`
       }
@@ -157,7 +172,7 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
       }
 
       if (success && pdf_base64) {
-        const bytes = Uint8Array.from(atob(pdf_base64), c => c.charCodeAt(0))
+        const bytes = Uint8Array.from(atob(pdf_base64), c => c.codePointAt(0))
         const blob = new Blob([bytes], { type: 'application/pdf' })
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
@@ -236,7 +251,7 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
               {mercadonaLoading ? (
                 <span className={styles.submitLoading}>
                   <span className={styles.submitSpinner} />
-                  Portal…
+                  <span>Portal…</span>
                 </span>
               ) : (
                 <>🏪 Factura oficial</>
@@ -247,7 +262,7 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
           {loading ? (
             <span className={styles.submitLoading}>
               <span className={styles.submitSpinner} />
-              Generating…
+              <span>Generating…</span>
             </span>
           ) : (
             <>
@@ -274,7 +289,7 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
               <line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
           </span>
-          Invoice Details
+          <span>Invoice Details</span>
         </h3>
         <div className={styles.grid3}>
           <Field label="Invoice No. *" error={errors.invoice_number}>
@@ -320,7 +335,7 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
               <line x1="3" y1="18" x2="3.01" y2="18"/>
             </svg>
           </span>
-          Line Items
+          <span>Line Items</span>
         </h3>
         <div className={styles.itemsTable}>
           <div className={styles.itemsHeader}>
@@ -399,11 +414,11 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
           <div className={styles.amountsCol}>
             <div className={styles.totalRow}>
               <span className={styles.totalLabel}>Subtotal</span>
-              <span className={styles.totalValue}>{currency} {parseFloat(subtotal || 0).toFixed(2)}</span>
+              <span className={styles.totalValue}>{currency} {Number.parseFloat(subtotal || 0).toFixed(2)}</span>
             </div>
             <div className={styles.totalRow}>
               <span className={styles.totalLabel}>
-                Tax
+                <span>Tax</span>
                 <input
                   {...register('tax_rate')}
                   type="number"
@@ -415,11 +430,11 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
                 />
                 <span className={styles.taxPercent}>%</span>
               </span>
-              <span className={styles.totalValue}>{currency} {parseFloat(taxAmount || 0).toFixed(2)}</span>
+              <span className={styles.totalValue}>{currency} {Number.parseFloat(taxAmount || 0).toFixed(2)}</span>
             </div>
             <div className={`${styles.totalRow} ${styles.grandTotal}`}>
               <span className={styles.totalLabel}>Total</span>
-              <span className={styles.totalValue}>{currency} {parseFloat(total || 0).toFixed(2)}</span>
+              <span className={styles.totalValue}>{currency} {Number.parseFloat(total || 0).toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -447,7 +462,7 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
           </h3>
           <div className={styles.screenshotGrid}>
             {mercadonaScreenshots.map((b64, i) => (
-              <div key={i} className={styles.screenshotWrap}>
+              <div key={`screenshot-${b64.slice(0, 8)}`} className={styles.screenshotWrap}>
                 <p className={styles.screenshotLabel}>Paso {i + 1}</p>
                 <img
                   src={`data:image/png;base64,${b64}`}
@@ -461,4 +476,24 @@ export default function InvoiceForm({ receiptData, onReset, onDownloaded }) {
       )}
     </form>
   )
+}
+
+InvoiceForm.propTypes = {
+  receiptData: PropTypes.shape({
+    vendor_name: PropTypes.string,
+    vendor_address: PropTypes.string,
+    vendor_phone: PropTypes.string,
+    vendor_tax_id: PropTypes.string,
+    date: PropTypes.string,
+    total: PropTypes.number,
+    receipt_number: PropTypes.string,
+    notes: PropTypes.string,
+    currency: PropTypes.string,
+    subtotal: PropTypes.number,
+    tax: PropTypes.number,
+    simplified_invoice_number: PropTypes.string,
+    items: PropTypes.array,
+  }),
+  onReset: PropTypes.func.isRequired,
+  onDownloaded: PropTypes.func.isRequired,
 }

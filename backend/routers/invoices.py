@@ -9,7 +9,7 @@ from models.invoice import InvoiceData
 router = APIRouter()
 
 
-@router.post("/generate")
+@router.post("/generate", responses={500: {"description": "PDF generation failed"}})
 def generate_invoice(invoice: InvoiceData):
     """Receive invoice data and return a PDF file."""
     try:
@@ -29,7 +29,7 @@ class BatchGenerateRequest(BaseModel):
     invoices: list[InvoiceData]
 
 
-@router.post("/generate-batch")
+@router.post("/generate-batch", responses={400: {"description": "Too many invoices"}})
 def generate_batch(request: BatchGenerateRequest):
     """Generate multiple invoice PDFs and return as ZIP."""
     if len(request.invoices) > 20:

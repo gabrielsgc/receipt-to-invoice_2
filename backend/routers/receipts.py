@@ -1,3 +1,4 @@
+from typing import Annotated
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from services.gpt_service import extract_receipt_data
 from services.ocr_service import pdf_to_image_bytes
@@ -37,8 +38,8 @@ async def _process_single(file: UploadFile) -> dict:
         return {"filename": file.filename, "success": False, "error": str(e)}
 
 
-@router.post("/analyze", response_model=ReceiptData)
-async def analyze_receipt(file: UploadFile = File(...)):
+@router.post("/analyze", response_model=ReceiptData, responses={502: {"description": "GPT extraction failed"}})
+async def analyze_receipt(file: Annotated[UploadFile, File(...)]):
     """Upload a receipt image or PDF and extract structured data."""
     result = await _process_single(file)
     if not result["success"]:
@@ -46,8 +47,8 @@ async def analyze_receipt(file: UploadFile = File(...)):
     return ReceiptData(**result["data"])
 
 
-@router.post("/analyze-batch")
-async def analyze_batch(files: list[UploadFile] = File(...)):
+@router.post("/analyze-batch", responses={400: {"description": "Too many files"}})
+async def analyze_batch(files: Annotated[list[UploadFile], File(...)]):
     """Upload multiple receipts. Returns list of results with success/error per file."""
     if len(files) > 20:
         raise HTTPException(status_code=400, detail="Maximum 20 files per batch")

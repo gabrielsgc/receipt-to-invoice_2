@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import toast from 'react-hot-toast'
 import axios from 'axios'
+import PropTypes from 'prop-types'
 import styles from './UploadReceipt.module.css'
 
 const ACCEPTED = {
@@ -147,4 +148,8 @@ export default function UploadReceipt({ onExtracted }) {
       </button>
     </div>
   )
+}
+
+UploadReceipt.propTypes = {
+  onExtracted: PropTypes.func.isRequired,
 }

@@ -372,7 +372,9 @@
   gap: 28px;
 }
 
-.notesCol {}
+.notesCol {
+  /* layout handled by parent grid */
+}
 
 .textarea {
   border: 1px solid var(--border-default);
