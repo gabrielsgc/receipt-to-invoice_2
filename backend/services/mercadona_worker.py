@@ -49,6 +49,21 @@ async def _select_date(page, selector, date_str):
     await page.locator(selector).click()
     await page.wait_for_timeout(1000)
     
+    # Parse current displayed month/year from calendar header
+    def _parse_header(text):
+        """Extract (month_num, year) from header like 'Abril | 2026'."""
+        name_to_num = {v.lower(): k for k, v in month_names.items()}
+        for word in text.replace("|", " ").split():
+            w = word.strip().lower()
+            if w in name_to_num:
+                m = name_to_num[w]
+            elif w.isdigit() and len(w) == 4:
+                y = int(w)
+        try:
+            return m, y
+        except UnboundLocalError:
+            return None, None
+
     # Navigate months backwards/forwards until we reach the target month/year
     for _ in range(24):  # max 2 years of navigation
         header = await page.locator(".m-datepicker-selector-divider").evaluate_all(
@@ -56,10 +71,25 @@ async def _select_date(page, selector, date_str):
         )
         header_text = header[0] if header else ""
         # Header looks like "Abril | 2026"
-        if f"{target_month_name}" in header_text and str(target_year) in header_text:
+        if target_month_name in header_text and str(target_year) in header_text:
             break
-        # Need to go backwards (earlier date) — click left arrow
-        await page.locator(".prev-double-arrow, m-icon.prev-double-arrow").first.click()
+
+        cur_m, cur_y = _parse_header(header_text)
+        if cur_m is None:
+            break
+        cur_val = cur_y * 12 + cur_m
+        tgt_val = target_year * 12 + target_month
+
+        if tgt_val < cur_val:
+            arrow = page.locator("m-icon.prev-double-arrow").first
+        else:
+            arrow = page.locator("m-icon.next-double-arrow").first
+
+        # Skip if arrow disabled (already at boundary)
+        arrow_classes = await arrow.get_attribute("class") or ""
+        if "disabled-arrow" in arrow_classes:
+            break
+        await arrow.click(force=True)
         await page.wait_for_timeout(300)
     
     # Click the target day — find cells that match and are in the current month
