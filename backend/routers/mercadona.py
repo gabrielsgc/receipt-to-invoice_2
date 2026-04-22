@@ -34,17 +34,29 @@ async def request_ticket(req: MercadonaTicketRequest):
     """Search for ticket on Mercadona tickets portal."""
     logger.info(f"Requesting Mercadona ticket: method={req.payment_method}, date={req.purchase_date}")
 
-    result = await request_mercadona_ticket(
-        payment_method=req.payment_method,
-        purchase_date=req.purchase_date,
-        total_amount=req.total_amount,
-        card_last4=req.card_last4,
-        store_address=req.store_address,
-        time_range=req.time_range,
-        products_hint=req.products_hint,
-        email=req.email,
-        headless=True,
-    )
+    try:
+        result = await request_mercadona_ticket(
+            payment_method=req.payment_method,
+            purchase_date=req.purchase_date,
+            total_amount=req.total_amount,
+            card_last4=req.card_last4,
+            store_address=req.store_address,
+            time_range=req.time_range,
+            products_hint=req.products_hint,
+            email=req.email,
+            headless=True,
+        )
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f"MERCADONA ERROR: {tb}", flush=True)
+        return MercadonaTicketResponse(
+            success=False,
+            message=f"Error: {repr(e)} | {tb[-500:]}",
+            tickets_found=[],
+            pdf_base64=None,
+            screenshots_base64=[],
+        )
 
     pdf_b64 = None
     if result.get("pdf_bytes"):
